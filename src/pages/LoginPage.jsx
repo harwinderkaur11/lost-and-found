@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function LoginPage({ navigate }) {
+export default function LoginPage({ navigate, setProfileImg })  {
   const [email,      setEmail]      = useState('')
   const [password,   setPassword]   = useState('')
   const [showPass,   setShowPass]   = useState(false)
@@ -10,6 +10,25 @@ export default function LoginPage({ navigate }) {
     e.preventDefault()
     if (!email.endsWith('@chitkara.edu.in')) { setEmailError(true); return }
     setEmailError(false)
+
+    // Check credentials against localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]')
+    const user = users.find(u => u.email === email && u.password === password)
+
+    if (!user) {
+      alert('Invalid email or password. Please sign up first.')
+      return
+    }
+
+    // Save logged-in user session
+    localStorage.setItem('loggedInUser', JSON.stringify(user))
+    navigate('dashboard')
+    localStorage.setItem('loggedInUser', JSON.stringify(user))
+
+    // Load this user's saved profile photo into app state
+    const userPhoto = localStorage.getItem(`profileImg_${user.email}`) || null
+    setProfileImg(userPhoto)
+
     navigate('dashboard')
   }
 

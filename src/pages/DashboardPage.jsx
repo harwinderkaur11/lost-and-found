@@ -5,7 +5,19 @@ import AnimatedBackground from '../components/AnimatedBackground.jsx'
 
 export default function DashboardPage({ navigate, profileImg }) {
   const [loading, setLoading] = useState(true)
-  useEffect(() => { const t = setTimeout(() => setLoading(false), 1000); return () => clearTimeout(t) }, [])
+  const [reports, setReports] = useState([])
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 1000)
+    // Load real reports from localStorage
+    const saved = JSON.parse(localStorage.getItem('userReports') || '[]')
+    setReports(saved)
+    return () => clearTimeout(t)
+  }, [])
+
+  const lostCount  = reports.filter(r => r.type === 'lost').length
+  const foundCount = reports.filter(r => r.type === 'found').length
+  const recentActivity = reports.slice(0, 3)  // 3 most recently submitted
 
   return (
     <>
@@ -22,17 +34,17 @@ export default function DashboardPage({ navigate, profileImg }) {
           <section className="stats-grid">
             <div className="stat-card animate__animated animate__fadeInUp" onClick={() => navigate('listings-lost')}>
               <div className="stat-icon" style={{ backgroundColor: '#1e40af' }}><i className="fas fa-question-circle" /></div>
-              <div className="stat-info"><h3>5</h3><p>Active Lost Reports</p></div>
+              <div className="stat-info"><h3>{lostCount}</h3><p>Active Lost Reports</p></div>
               <div className="stat-bg-icon"><i className="fas fa-question-circle" /></div>
             </div>
             <div className="stat-card animate__animated animate__fadeInUp" onClick={() => navigate('listings-found')}>
               <div className="stat-icon" style={{ backgroundColor: '#1cc88a' }}><i className="fas fa-check-circle" /></div>
-              <div className="stat-info"><h3>3</h3><p>Found Items Reported</p></div>
+              <div className="stat-info"><h3>{foundCount}</h3><p>Found Items Reported</p></div>
               <div className="stat-bg-icon"><i className="fas fa-check-circle" /></div>
             </div>
             <div className="stat-card animate__animated animate__fadeInUp">
               <div className="stat-icon" style={{ backgroundColor: '#f6c23e' }}><i className="fas fa-exchange-alt" /></div>
-              <div className="stat-info"><h3>2</h3><p>Successful Returns</p></div>
+              <div className="stat-info"><h3>{reports.length}</h3><p>Total Reports</p></div>
               <div className="stat-bg-icon"><i className="fas fa-exchange-alt" /></div>
             </div>
           </section>
@@ -40,25 +52,33 @@ export default function DashboardPage({ navigate, profileImg }) {
           <section className="activity-section">
             <div className="section-header">
               <h2><i className="fas fa-history" /> Recent Activity</h2>
-              <a href="#" className="view-all">View All</a>
+              <a href="#" className="view-all" onClick={e => { e.preventDefault(); navigate('report') }}>View All</a>
             </div>
             <div className="activity-timeline">
-              {[
-                { cls: 'success', icon: 'fa-check',       title: 'Wallet Returned!',      body: 'Your lost wallet has been returned by Sarah J.', time: '2 hours ago' },
-                { cls: 'primary', icon: 'fa-bell',         title: 'New Match Found',        body: 'Potential match found for your lost keys report.', time: '1 day ago'  },
-                { cls: 'warning', icon: 'fa-exclamation',  title: 'Report Expiring Soon',   body: 'Your lost phone report will expire in 3 days.',   time: '2 days ago' },
-              ].map(({ cls, icon, title, body, time }) => (
-                <div key={title} className="timeline-item animate__animated animate__fadeInRight">
-                  <div className={`timeline-icon ${cls}`}><i className={`fas ${icon}`} /></div>
-                  <div className="timeline-content">
-                    <h4>{title}</h4>
-                    <p>{body}</p>
-                    <span className="timeline-time"><i className="far fa-clock" /> {time}</span>
+              {recentActivity.length === 0 ? (
+                <p style={{ color: '#999', padding: '10px 0' }}>
+                  No reports yet.{' '}
+                  <a href="#" style={{ color: '#4e73df' }} onClick={e => { e.preventDefault(); navigate('report') }}>
+                    Report an item
+                  </a>
+                </p>
+              ) : (
+                recentActivity.map(r => (
+                  <div key={r.id} className="timeline-item animate__animated animate__fadeInRight">
+                    <div className={`timeline-icon ${r.type === 'lost' ? 'primary' : 'success'}`}>
+                      <i className={`fas ${r.type === 'lost' ? 'fa-question' : 'fa-check'}`} />
+                    </div>
+                    <div className="timeline-content">
+                      <h4>{r.type === 'lost' ? '❓' : '✅'} {r.title}</h4>
+                      <p>📍 {r.location} {r.category ? `• 🏷️ ${r.category}` : ''}</p>
+                      <span className="timeline-time"><i className="far fa-clock" /> {r.date}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </section>
+
         </main>
       </div>
     </>

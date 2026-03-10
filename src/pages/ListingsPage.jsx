@@ -1,15 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar.jsx'
 import Modal from '../components/Modal.jsx'
 import { listingsData } from '../data/data.js'
 
-export default function ListingsPage({ navigate, profileImg, initialFilter = 'all' }) {
-  const [filter, setFilter] = useState(initialFilter)
-  const [search, setSearch] = useState('')
-  const [sort,   setSort]   = useState('date-desc')
-  const [modal,  setModal]  = useState(null)
+// Merge user reports from localStorage with default listings
+const loadAllListings = () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem('userReports') || '[]')
+    return [...saved, ...listingsData]  // user reports appear at top
+  } catch { return listingsData }
+}
 
-  const filtered = listingsData
+export default function ListingsPage({ navigate, profileImg, initialFilter = 'all' }) {
+  const [filter,   setFilter] = useState(initialFilter)
+  const [search,   setSearch] = useState('')
+  const [sort,     setSort]   = useState('date-desc')
+  const [modal,    setModal]  = useState(null)
+  const [allItems, setAllItems] = useState(loadAllListings)  // load on mount
+
+  useEffect(() => {
+    setFilter(initialFilter)
+  }, [initialFilter])
+
+  // Reload from localStorage every time this page becomes active
+  useEffect(() => {
+    setAllItems(loadAllListings())
+  }, [initialFilter])
+
+  const filtered = allItems
     .filter(i => filter === 'all' || i.type === filter)
     .filter(i => i.title.toLowerCase().includes(search.toLowerCase()) || i.desc.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {

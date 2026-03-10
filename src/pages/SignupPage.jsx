@@ -14,7 +14,19 @@ export default function SignupPage({ navigate }) {
     if (!email.endsWith('@chitkara.edu.in')) { setEmailError(true);  valid = false } else setEmailError(false)
     if (password.length < 8)                 { setPassError(true);   valid = false } else setPassError(false)
     if (!valid) return
-    alert('Account created!')
+
+    // Check if email already registered
+    const existing = JSON.parse(localStorage.getItem('users') || '[]')
+    if (existing.find(u => u.email === email)) {
+      alert('An account with this email already exists!')
+      return
+    }
+
+    // Save new user to localStorage
+    const newUser = { name, email, password }
+    localStorage.setItem('users', JSON.stringify([...existing, newUser]))
+
+    alert('Account created! Please login.')
     navigate('login')
   }
 

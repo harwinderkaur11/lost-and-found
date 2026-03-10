@@ -33,8 +33,8 @@ export default function UserProfilePage({ navigate, profileImg, setProfileImg })
             <button className="btn-remove" onClick={() => setProfileImg(null)}>Remove Photo</button>
           </div>
           <div className="profile-info">
-            <h2 className="user-name">John Doe</h2>
-            <p className="user-email">john.doe@chitkara.edu.in</p>
+            <h2 className="user-name">{JSON.parse(localStorage.getItem('loggedInUser') || '{}').name || 'Guest'}</h2>
+            <p className="user-email">{JSON.parse(localStorage.getItem('loggedInUser') || '{}').email || ''}</p>
             <div className="user-stats">
               <div className="stat-card"><div className="stat-info"><h3>0</h3><p>Lost Items</p></div></div>
               <div className="stat-card"><div className="stat-info"><h3>0</h3><p>Found Items</p></div></div>

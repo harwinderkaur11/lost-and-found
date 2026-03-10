@@ -14,7 +14,25 @@ import LogoutPage      from './pages/LogoutPage.jsx'
 
 export default function App() {
   const [page, setPage] = useState('index')
-  const [profileImg, setProfileImg] = useState(null)
+
+  // Get the logged-in user's email to use as a unique key
+  const getUserKey = () => {
+    const user = JSON.parse(localStorage.getItem('loggedInUser') || '{}')
+    return user.email ? `profileImg_${user.email}` : 'profileImg_guest'
+  }
+
+  // Load THIS user's profile image on first render
+  const [profileImg, setProfileImgState] = useState(
+    () => localStorage.getItem(getUserKey()) || null
+  )
+
+  // Save/remove photo under this user's own key
+  const setProfileImg = (val) => {
+    const key = getUserKey()
+    if (val) localStorage.setItem(key, val)
+    else localStorage.removeItem(key)
+    setProfileImgState(val)
+  }
 
   const navigate = useCallback((target) => {
     setPage(target)
@@ -24,20 +42,20 @@ export default function App() {
   const shared = { navigate, profileImg, setProfileImg }
 
   const routes = {
-    index:          <IndexPage       {...shared} />,
-    login:          <LoginPage       {...shared} />,
-    signup:         <SignupPage      {...shared} />,
-    dashboard:      <DashboardPage   {...shared} />,
-    listings:       <ListingsPage    {...shared} initialFilter="all"   />,
-    'listings-lost':  <ListingsPage  {...shared} initialFilter="lost"  />,
-    'listings-found': <ListingsPage  {...shared} initialFilter="found" />,
-    found:          <FoundItemsPage  {...shared} />,
-    report:         <ReportPage      {...shared} />,
-    about:          <AboutPage       {...shared} />,
-    contact:        <ContactPage     {...shared} />,
-    settings:       <SettingsPage    {...shared} />,
-    userprofile:    <UserProfilePage {...shared} />,
-    logout:         <LogoutPage      {...shared} />,
+    index:            <IndexPage       {...shared} />,
+    login:            <LoginPage       {...shared} />,
+    signup:           <SignupPage      {...shared} />,
+    dashboard:        <DashboardPage   {...shared} />,
+    listings:         <ListingsPage    {...shared} initialFilter="all"   />,
+    'listings-lost':  <ListingsPage    {...shared} initialFilter="lost"  />,
+    'listings-found': <ListingsPage    {...shared} initialFilter="found" />,
+    found:            <FoundItemsPage  {...shared} />,
+    report:           <ReportPage      {...shared} />,
+    about:            <AboutPage       {...shared} />,
+    contact:          <ContactPage     {...shared} />,
+    settings:         <SettingsPage    {...shared} />,
+    userprofile:      <UserProfilePage {...shared} />,
+    logout:           <LogoutPage      {...shared} />,
   }
 
   return routes[page] ?? routes.index

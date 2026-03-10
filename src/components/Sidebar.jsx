@@ -7,6 +7,9 @@ const Sidebar = ({ activePage, navigate, profileImg }) => {
     if (window.confirm('Are you sure you want to logout?')) navigate('logout')
   }
 
+  // Read logged-in user from localStorage
+  const user = JSON.parse(localStorage.getItem('loggedInUser') || '{}')
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -17,9 +20,11 @@ const Sidebar = ({ activePage, navigate, profileImg }) => {
           onClick={() => navigate('userprofile')}
           title="View Profile"
         />
-        <h3>John Doe</h3>
-        <p>Member since June 2023</p>
+        <h3>{user.name || 'Guest'}</h3>
+        <p>{user.email || ''}</p>
       </div>
+
+  
 
       <nav className="sidebar-nav">
         <ul>

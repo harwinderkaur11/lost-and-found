@@ -4,6 +4,9 @@ export default function LogoutPage({ navigate }) {
   const [count, setCount] = useState(5)
 
   useEffect(() => {
+    // Clear session on logout
+    localStorage.removeItem('loggedInUser')
+
     const interval = setInterval(() => {
       setCount(c => {
         if (c <= 1) { clearInterval(interval); navigate('index'); return 0 }
