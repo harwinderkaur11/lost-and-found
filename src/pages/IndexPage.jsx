@@ -35,7 +35,7 @@ const IndexPage = ({ navigate }) => (
     </section>
 
     <footer className="landing-footer">
-      <p>&copy; 2025 Lost &amp; Found. All rights reserved.</p>
+      <p>&copy; 2026 Lost &amp; Found. All rights reserved.</p>
     </footer>
   </div>
 )
